@@ -1,0 +1,21 @@
+{
+  "name": "file-convert",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Convertio benzeri yenilikçi dosya & görüntü dönüştürme uygulaması (Next.js + Nest.js)",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm --workspace apps/api run dev",
+    "dev:web": "npm --workspace apps/web run dev",
+    "build": "npm --workspace apps/api run build && npm --workspace apps/web run build",
+    "start": "concurrently -n API,WEB -c magenta,cyan \"npm:start:api\" \"npm:start:web\"",
+    "start:api": "npm --workspace apps/api run start",
+    "start:web": "npm --workspace apps/web run start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
