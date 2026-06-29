@@ -89,4 +89,10 @@ export const CATEGORY_META: Record<
     ring: 'ring-rose-400/40',
     emoji: '📦',
   },
+  cad: {
+    label: 'CAD/Çizim',
+    gradient: 'from-cyan-500 to-sky-600',
+    ring: 'ring-cyan-400/40',
+    emoji: '📐',
+  },
 };

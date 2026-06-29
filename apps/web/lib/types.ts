@@ -9,7 +9,8 @@ export type Category =
   | 'data'
   | 'font'
   | 'cert'
-  | 'archive';
+  | 'archive'
+  | 'cad';
 
 export interface FormatGroup {
   category: Category;

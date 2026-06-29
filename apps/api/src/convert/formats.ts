@@ -23,7 +23,8 @@ export type Category =
   | 'data'
   | 'font'
   | 'cert'
-  | 'archive';
+  | 'archive'
+  | 'cad';
 
 export interface FormatGroup {
   category: Category;
@@ -99,6 +100,18 @@ export const PRESENTATION: FormatGroup = {
 };
 
 /**
+ * CAD/Çizim — @mlightcad/libredwg-web (DWG okuma, WASM) + LibreOffice Draw (PDF/DXF render).
+ * DWG, libredwg ile gerçek olarak okunur (dxf/svg üretir); PDF LibreOffice Draw'dan alınır.
+ * PDF yolu LibreOffice gerektirdiğinden grup yalnız soffice kuruluyken listelenir (bkz. getGroups).
+ */
+export const CAD: FormatGroup = {
+  category: 'cad',
+  label: 'CAD/Çizim',
+  inputs: ['dwg', 'dxf'],
+  outputs: ['pdf', 'svg', 'dxf'],
+};
+
+/**
  * Veri — js-yaml, fast-xml-parser, @iarna/toml (+ tablo çıktısı için SheetJS).
  * Ağaç biçimleri (json/yaml/xml/toml) ↔ tablo ailesine de açılır: xlsx ve html çıktısı.
  */
@@ -154,7 +167,7 @@ export function getGroups(): FormatGroup[] {
     }
     return g;
   });
-  groups.push(RICHDOC, PRESENTATION);
+  groups.push(RICHDOC, PRESENTATION, CAD);
   return groups;
 }
 
@@ -183,6 +196,8 @@ export const UNSUPPORTED: Record<string, string> = {
   rar: 'RAR (unrar gerekir)', '7z': '7-Zip (7za gerekir)', iso: 'ISO', cab: 'CAB',
   apk: 'APK (platformlar arası dönüştürülemez)', aab: 'AAB', ipa: 'iOS IPA',
   fbx: '3D FBX', '3ds': '3D', dae: 'COLLADA', step: 'CAD STEP', stp: 'CAD', iges: 'CAD', igs: 'CAD',
+  // DWG/DXF girişi → LibreOffice Draw (kuruluysa pdf/svg çıkışı açılır; bu liste yalnız kurulu değilken gösterilir)
+  dwg: 'AutoCAD DWG (LibreOffice gerekir)', dxf: 'AutoCAD DXF (LibreOffice gerekir)',
   // Sertifika anahtar paketleri → şifre girişi gerekir
   pfx: 'PKCS#12 (şifre gerekir)', p12: 'PKCS#12 (şifre gerekir)',
   // OTF çıkışı CFF→quadratic dönüşümü gerektirir

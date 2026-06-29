@@ -1,11 +1,51 @@
 import { execFile } from 'child_process';
-import { promisify } from 'util';
 import { existsSync } from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
-const execFileP = promisify(execFile);
+/** soffice çağrısı için üst sınır. Bazı çizimler içe-aktarıcıyı askıya alabildiğinden zorunlu. */
+const SOFFICE_TIMEOUT = 90_000;
+
+/**
+ * soffice'i sert timeout ile çalıştırır; süre dolarsa TÜM süreç ağacını öldürür.
+ * LibreOffice launcher (soffice.exe) işi alt süreç soffice.bin'e devrettiğinden, yalnız
+ * launcher'a sinyal göndermek yetmez — Windows'ta `taskkill /T` ile ağaç komple kapatılır.
+ * Aksi halde takılan bir dönüşüm hem isteği hem soffice.bin'i süresiz kilitler.
+ */
+function runSoffice(soffice: string, args: string[]): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    let timer: NodeJS.Timeout;
+    let timedOut = false;
+    const child = execFile(
+      soffice,
+      args,
+      { windowsHide: true, maxBuffer: 64 * 1024 * 1024 },
+      (err) => {
+        clearTimeout(timer);
+        if (timedOut) return;
+        if (err) reject(err);
+        else resolve();
+      },
+    );
+    timer = setTimeout(() => {
+      timedOut = true;
+      const pid = child.pid;
+      if (pid) {
+        if (process.platform === 'win32') {
+          execFile('taskkill', ['/F', '/T', '/PID', String(pid)], () => undefined);
+        } else {
+          try {
+            process.kill(pid, 'SIGKILL');
+          } catch {
+            /* zaten ölmüş olabilir */
+          }
+        }
+      }
+      reject(new Error('LibreOffice zaman aşımına uğradı (çizim çok karmaşık veya içe-aktarma takıldı).'));
+    }, SOFFICE_TIMEOUT);
+  });
+}
 
 /**
  * LibreOffice (soffice) headless dönüştürme köprüsü.
@@ -82,7 +122,7 @@ export async function libreConvert(
       work,
       inPath,
     ];
-    await execFileP(soffice, args, { timeout: 120000, windowsHide: true });
+    await runSoffice(soffice, args);
 
     if (!existsSync(outPath)) {
       throw new Error(`LibreOffice çıktı üretmedi (${sourceExt}→${targetExt}).`);

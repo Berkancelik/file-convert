@@ -75,7 +75,7 @@ export function Dropzone({ onFiles }: Props) {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-500">
-          {['JPG', 'PNG', 'HEIC', 'WEBP', 'MP4', 'MP3', 'PDF', 'XLSX', 'TTF', 'ZIP', '+60'].map((f) => (
+          {['JPG', 'PNG', 'HEIC', 'WEBP', 'MP4', 'MP3', 'PDF', 'XLSX', 'TTF', 'ZIP', 'DWG', '+60'].map((f) => (
             <span key={f} className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1">
               {f}
             </span>

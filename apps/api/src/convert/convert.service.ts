@@ -13,6 +13,7 @@ import { convertFont } from './converters/font.converter';
 import { convertCert } from './converters/cert.converter';
 import { convertArchive } from './converters/archive.converter';
 import { convertOffice } from './converters/office.converter';
+import { convertCad } from './converters/cad.converter';
 import { isAvailable as libreOfficeAvailable } from './libreoffice';
 
 interface StoredResult {
@@ -50,6 +51,7 @@ const MIME: Record<string, string> = {
   ppt: 'application/vnd.ms-powerpoint',
   pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   odp: 'application/vnd.oasis.opendocument.presentation',
+  dwg: 'image/vnd.dwg', dxf: 'image/vnd.dxf',
 };
 
 /** Hangi (kategori, kaynak, hedef) üçlüsünün LibreOffice ile yapılacağını belirler. */
@@ -143,6 +145,12 @@ export class ConvertService {
           }
           case 'cert': {
             const res = await convertCert(buffer, sourceExt, target);
+            outBuffer = res.buffer;
+            outExt = res.ext;
+            break;
+          }
+          case 'cad': {
+            const res = await convertCad(buffer, sourceExt, target);
             outBuffer = res.buffer;
             outExt = res.ext;
             break;
